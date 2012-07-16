@@ -148,8 +148,8 @@ module Geocoder::Store
         distance = full_distance_from_sql(latitude, longitude, options)
         conditions = ["#{distance} <= ?", radius]
         default_near_scope_options(latitude, longitude, radius, options).merge(
-          :select => "#{options[:select] || full_column_name("*")}, " +
-            "#{distance} AS distance" +
+          :select => "#{options[:select] || full_column_name("*")}" +
+            ( options[:ignore_distance] ? '' : ", #{distance} AS distance" ) +
             (bearing ? ", #{bearing} AS bearing" : ""),
           :conditions => add_exclude_condition(conditions, options[:exclude])
         )
@@ -222,8 +222,8 @@ module Geocoder::Store
           [b[0], b[2], b[1], b[3]
         ]
         default_near_scope_options(latitude, longitude, radius, options).merge(
-          :select => "#{options[:select] || full_column_name("*")}, " +
-            "#{distance} AS distance" +
+          :select => "#{options[:select] || full_column_name("*")}" +
+            ( options[:ignore_distance] ? '' : ", #{distance} AS distance" ) +
             (bearing ? ", #{bearing} AS bearing" : ""),
           :conditions => add_exclude_condition(conditions, options[:exclude])
         )
@@ -234,7 +234,7 @@ module Geocoder::Store
       #
       def default_near_scope_options(latitude, longitude, radius, options)
         {
-          :order  => options[:order] || "distance",
+          :order  => options[:order] || options[:ignore_distance] ? nil : "distance",
           :limit  => options[:limit],
           :offset => options[:offset]
         }
