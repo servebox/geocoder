@@ -61,7 +61,7 @@ module Geocoder
       #
       def nearbys(radius = 20, options = {})
         return [] unless geocoded?
-        options.merge!(:exclude => self)
+        options.merge!(:exclude => self) unless options[:include_self]
         self.class.near(self, radius, options)
       end
 
